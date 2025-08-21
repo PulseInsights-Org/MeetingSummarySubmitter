@@ -162,11 +162,6 @@ def main():
                     st.session_state.intake_initialized = True
                     st.success(f"Intake initialized with ID: `{intake_id}`")
     
-    with col2:
-        if st.session_state.intake_initialized:
-            st.info(f"Current Intake ID: `{st.session_state.intake_id}`")
-        else:
-            st.warning("Please initialize an intake first")
     
     # Only show upload options if intake is initialized
     if st.session_state.intake_initialized:
