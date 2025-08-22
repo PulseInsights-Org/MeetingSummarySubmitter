@@ -10,42 +10,13 @@ from supabase import create_client, Client
 API_BASE_URL = "https://dev.pulse-api.getpulseinsights.ai"
 
 # Supabase Configuration
-def get_supabase_config():
-    """Get Supabase configuration with proper error handling"""
-    try:
-        # Check if secrets exist
-        if hasattr(st, 'secrets') and 'SUPABASE_URL' in st.secrets and 'SUPABASE_ANON_KEY' in st.secrets:
-            supabase_url = st.secrets["SUPABASE_URL"]
-            supabase_key = st.secrets["SUPABASE_ANON_KEY"]
-            
-            # Validate URL format
-            if not supabase_url or supabase_url == "your-supabase-url":
-                st.error("❌ Supabase URL not configured. Please set SUPABASE_URL in your secrets.")
-                return None, None
-            
-            if not supabase_key or supabase_key == "your-supabase-anon-key":
-                st.error("❌ Supabase API key not configured. Please set SUPABASE_ANON_KEY in your secrets.")
-                return None, None
-            
-            return supabase_url, supabase_key
-        else:
-            st.error("❌ Supabase configuration missing. Please add SUPABASE_URL and SUPABASE_ANON_KEY to your secrets.")
-            return None, None
-    except Exception as e:
-        st.error(f"❌ Error accessing Supabase configuration: {str(e)}")
-        return None, None
+SUPABASE_URL = st.secrets.get("SUPABASE_URL", "your-supabase-url")
+SUPABASE_KEY = st.secrets.get("SUPABASE_ANON_KEY", "your-supabase-anon-key")
 
 @st.cache_resource
-def init_supabase() -> Optional[Client]:
-    """Initialize Supabase client with error handling"""
-    try:
-        supabase_url, supabase_key = get_supabase_config()
-        if supabase_url and supabase_key:
-            return create_client(supabase_url, supabase_key)
-        return None
-    except Exception as e:
-        st.error(f"❌ Failed to initialize Supabase client: {str(e)}")
-        return None
+def init_supabase() -> Client:
+    """Initialize Supabase client"""
+    return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def load_modern_css():
     """Load modern CSS with premium design"""
@@ -150,10 +121,9 @@ def load_modern_css():
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: var(--spacing-2xl);
+        padding: var(--spacing-xl);
         position: relative;
         overflow: hidden;
-        min-height: 100vh;
     }
     
     .login-container {
@@ -161,7 +131,7 @@ def load_modern_css():
         backdrop-filter: blur(20px);
         border: 1px solid var(--gray-200);
         border-radius: var(--radius-3xl);
-        padding: var(--spacing-5xl);
+        padding: var(--spacing-2xl);
         max-width: 480px;
         width: 100%;
         box-shadow: var(--shadow-2xl);
@@ -531,27 +501,10 @@ def authenticate_user(org_name: str, password: str) -> tuple[bool, Optional[str]
     """Authenticate user with org_name and password against Supabase"""
     try:
         if not org_name or not password:
-            st.error("❌ Please enter both organization name and password")
-            return False, None
-        
-        # Check Supabase configuration first
-        supabase_url, supabase_key = get_supabase_config()
-        if not supabase_url or not supabase_key:
-            st.error("❌ Database configuration error. Please contact support.")
             return False, None
             
         supabase = init_supabase()
-        if not supabase:
-            st.error("❌ Unable to connect to database. Please contact support.")
-            return False, None
-        
-        # Test connection with a simple query
-        try:
-            response = supabase.table("orgs").select("id, org_name, password").eq("org_name", org_name).execute()
-        except Exception as db_error:
-            st.error(f"❌ Database connection failed: {str(db_error)}")
-            st.info("💡 This might be due to missing Supabase configuration. Please ensure SUPABASE_URL and SUPABASE_ANON_KEY are set in your secrets.")
-            return False, None
+        response = supabase.table("orgs").select("id, org_name, password").eq("org_name", org_name).execute()
         
         if not response.data:
             st.error("🚫 Organization not found")
@@ -560,7 +513,6 @@ def authenticate_user(org_name: str, password: str) -> tuple[bool, Optional[str]
         org_data = response.data[0]
         
         if org_data["password"] == password:
-            st.success("✅ Authentication successful!")
             return True, org_data["id"]
         else:
             st.error("🔑 Invalid password")
@@ -568,7 +520,6 @@ def authenticate_user(org_name: str, password: str) -> tuple[bool, Optional[str]
             
     except Exception as e:
         st.error(f"❌ Authentication error: {str(e)}")
-        st.info("💡 If this error persists, please check your Supabase configuration.")
         return False, None
 
 def login_page():
@@ -629,48 +580,6 @@ def login_page():
                         st.success("✅ Login successful! Redirecting...")
                         time.sleep(1)
                         st.rerun()
-    
-    # Debug section for configuration issues
-    with st.expander("🔧 Configuration Debug", expanded=False):
-        st.write("**Supabase Configuration Status:**")
-        
-        supabase_url, supabase_key = get_supabase_config()
-        
-        if supabase_url and supabase_url != "your-supabase-url":
-            st.success(f"✅ Supabase URL configured: {supabase_url[:30]}...")
-        else:
-            st.error("❌ Supabase URL not configured")
-            
-        if supabase_key and supabase_key != "your-supabase-anon-key":
-            st.success(f"✅ Supabase API Key configured: {supabase_key[:20]}...")
-        else:
-            st.error("❌ Supabase API Key not configured")
-        
-        if supabase_url and supabase_key:
-            if st.button("🧪 Test Database Connection"):
-                try:
-                    supabase = init_supabase()
-                    if supabase:
-                        # Test with a simple query
-                        response = supabase.table("orgs").select("count", count="exact").execute()
-                        st.success(f"✅ Database connection successful! Found {response.count} organizations.")
-                    else:
-                        st.error("❌ Failed to initialize Supabase client")
-                except Exception as e:
-                    st.error(f"❌ Database test failed: {str(e)}")
-        
-        st.write("**Required Secrets:**")
-        st.code("""
-        # Add these to your Streamlit secrets:
-        SUPABASE_URL = "https://your-project.supabase.co"
-        SUPABASE_ANON_KEY = "your-anon-key-here"
-        """)
-        
-        st.write("**How to set secrets:**")
-        st.write("1. Go to your Streamlit Cloud dashboard")
-        st.write("2. Select your app")
-        st.write("3. Go to Settings > Secrets")
-        st.write("4. Add the SUPABASE_URL and SUPABASE_ANON_KEY")
 
 def generate_idempotency_key():
     """Generate a unique idempotency key"""
@@ -866,7 +775,7 @@ def main_app():
     """, unsafe_allow_html=True)
     
     # Logout button prominently displayed
-    col1, col2, col3 = st.columns([6, 1, 1])
+    col1, col2, col3 = st.columns([6, 1, 2])
     with col3:
         if st.button("👋 Sign Out", key="logout_btn", use_container_width=True):
             logout()
