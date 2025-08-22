@@ -13,12 +13,18 @@ def generate_idempotency_key():
     """Generate a unique idempotency key"""
     return str(uuid.uuid4())
 
+def get_or_create_idempotency_key():
+    """Get existing idempotency key or create a new one"""
+    if "idempotency_key" not in st.session_state or st.session_state.idempotency_key is None:
+        st.session_state.idempotency_key = generate_idempotency_key()
+    return st.session_state.idempotency_key
+
 def init_intake() -> Optional[str]:
     """Initialize a new intake and return the intake_id"""
     try:
         headers = {
             "x-org-id": ORG_ID,
-            "x-idempotency-key": generate_idempotency_key()
+            "x-idempotency-key": get_or_create_idempotency_key()
         }
         
         response = requests.post(
@@ -40,7 +46,8 @@ def upload_file(intake_id: str, uploaded_file) -> bool:
     """Upload a file to the intake"""
     try:
         headers = {
-            "x-org-id": ORG_ID
+            "x-org-id": ORG_ID,
+            "x-idempotency-key": get_or_create_idempotency_key()
         }
         
         files = {
@@ -55,6 +62,8 @@ def upload_file(intake_id: str, uploaded_file) -> bool:
         
         if response.status_code == 200:
             st.success("File uploaded successfully!")
+            # Generate new idempotency key for next operation
+            st.session_state.idempotency_key = generate_idempotency_key()
             return True
         else:
             st.error(f"Failed to upload file: {response.status_code} - {response.text}")
@@ -67,7 +76,8 @@ def upload_text(intake_id: str, text_content: str) -> bool:
     """Upload text content to the intake"""
     try:
         headers = {
-            "x-org-id": ORG_ID
+            "x-org-id": ORG_ID,
+            "x-idempotency-key": get_or_create_idempotency_key()
         }
         
         data = {
@@ -82,6 +92,8 @@ def upload_text(intake_id: str, text_content: str) -> bool:
         
         if response.status_code == 200:
             st.success("Text uploaded successfully!")
+            # Generate new idempotency key for next operation
+            st.session_state.idempotency_key = generate_idempotency_key()
             return True
         else:
             st.error(f"Failed to upload text: {response.status_code} - {response.text}")
@@ -133,6 +145,15 @@ def finalize_intake(intake_id: str) -> bool:
         st.error(f"Error finalizing intake: {str(e)}")
         return False
 
+def reset_session():
+    """Reset the session and clear all state"""
+    st.session_state.intake_id = None
+    st.session_state.intake_initialized = False
+    st.session_state.idempotency_key = None  # Clear idempotency key to generate new one
+    # Clear any other session state variables if needed
+    st.success("Session reset successfully!")
+    st.rerun()
+
 def main():
     st.set_page_config(
         page_title="Pulse API Client",
@@ -148,6 +169,8 @@ def main():
         st.session_state.intake_id = None
     if "intake_initialized" not in st.session_state:
         st.session_state.intake_initialized = False
+    if "idempotency_key" not in st.session_state:
+        st.session_state.idempotency_key = None
     
     # Step 1: Initialize Intake
     st.header("Step 1: Initialize Intake")
@@ -227,9 +250,7 @@ def main():
         
         with col3:
             if st.button("🔄 Reset Session", type="secondary"):
-                st.session_state.intake_id = None
-                st.session_state.intake_initialized = False
-                st.rerun()
+                reset_session()  # Now uses dedicated function that generates new idempotency keys
     
   
 if __name__ == "__main__":
