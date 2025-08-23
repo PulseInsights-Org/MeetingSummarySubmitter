@@ -20,15 +20,15 @@ def init_supabase() -> Client:
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def load_modern_css():
-    """Load modern CSS with premium design"""
+    """Load modern CSS with premium design and dark mode support"""
     st.markdown("""
     <style>
     /* Import premium fonts */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
     
-    /* Modern Color System */
+    /* Modern Color System with Dark Mode Support */
     :root {
-        /* Primary brand colors */
+        /* Primary brand colors (same in both themes) */
         --primary-50: #eff6ff;
         --primary-100: #dbeafe;
         --primary-200: #bfdbfe;
@@ -40,20 +40,7 @@ def load_modern_css():
         --primary-800: #1e40af;
         --primary-900: #1e3a8a;
         
-        /* Neutral colors */
-        --gray-25: #fcfcfd;
-        --gray-50: #f9fafb;
-        --gray-100: #f2f4f7;
-        --gray-200: #eaecf0;
-        --gray-300: #d0d5dd;
-        --gray-400: #98a2b3;
-        --gray-500: #667085;
-        --gray-600: #475467;
-        --gray-700: #344054;
-        --gray-800: #1d2939;
-        --gray-900: #101828;
-        
-        /* Semantic colors */
+        /* Semantic colors (same in both themes) */
         --success-50: #ecfdf3;
         --success-500: #12b76a;
         --success-600: #039855;
@@ -65,14 +52,6 @@ def load_modern_css():
         --warning-50: #fffaeb;
         --warning-500: #f79009;
         --warning-600: #dc6803;
-        
-        /* Shadows */
-        --shadow-xs: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
-        --shadow-sm: 0 1px 3px 0 rgba(16, 24, 40, 0.1), 0 1px 2px 0 rgba(16, 24, 40, 0.06);
-        --shadow-md: 0 4px 8px -2px rgba(16, 24, 40, 0.1), 0 2px 4px -2px rgba(16, 24, 40, 0.06);
-        --shadow-lg: 0 12px 16px -4px rgba(16, 24, 40, 0.08), 0 4px 6px -2px rgba(16, 24, 40, 0.03);
-        --shadow-xl: 0 20px 24px -4px rgba(16, 24, 40, 0.08), 0 8px 8px -4px rgba(16, 24, 40, 0.03);
-        --shadow-2xl: 0 24px 48px -12px rgba(16, 24, 40, 0.18);
         
         /* Border radius */
         --radius-xs: 2px;
@@ -96,6 +75,68 @@ def load_modern_css():
         --spacing-5xl: 64px;
     }
     
+    /* Light theme (default) */
+    :root {
+        --bg-primary: #fcfcfd;
+        --bg-secondary: white;
+        --bg-tertiary: #f9fafb;
+        --bg-card: rgba(255, 255, 255, 0.95);
+        --bg-input: #f9fafb;
+        --bg-input-focus: white;
+        --bg-gradient: linear-gradient(135deg, #f9fafb 0%, white 100%);
+        
+        --text-primary: #101828;
+        --text-secondary: #344054;
+        --text-tertiary: #667085;
+        --text-muted: #98a2b3;
+        
+        --border-primary: #eaecf0;
+        --border-secondary: #d0d5dd;
+        --border-focus: var(--primary-500);
+        
+        --shadow-xs: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
+        --shadow-sm: 0 1px 3px 0 rgba(16, 24, 40, 0.1), 0 1px 2px 0 rgba(16, 24, 40, 0.06);
+        --shadow-md: 0 4px 8px -2px rgba(16, 24, 40, 0.1), 0 2px 4px -2px rgba(16, 24, 40, 0.06);
+        --shadow-lg: 0 12px 16px -4px rgba(16, 24, 40, 0.08), 0 4px 6px -2px rgba(16, 24, 40, 0.03);
+        --shadow-xl: 0 20px 24px -4px rgba(16, 24, 40, 0.08), 0 8px 8px -4px rgba(16, 24, 40, 0.03);
+        --shadow-2xl: 0 24px 48px -12px rgba(16, 24, 40, 0.18);
+    }
+    
+    /* Dark theme */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --bg-primary: #0c111c;
+            --bg-secondary: #151b26;
+            --bg-tertiary: #1f2937;
+            --bg-card: rgba(21, 27, 38, 0.95);
+            --bg-input: #1f2937;
+            --bg-input-focus: #2d3748;
+            --bg-gradient: linear-gradient(135deg, #151b26 0%, #1f2937 100%);
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #e2e8f0;
+            --text-tertiary: #cbd5e1;
+            --text-muted: #94a3b8;
+            
+            --border-primary: #334155;
+            --border-secondary: #475569;
+            --border-focus: var(--primary-400);
+            
+            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 12px 16px -4px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+            --shadow-xl: 0 20px 24px -4px rgba(0, 0, 0, 0.5), 0 8px 8px -4px rgba(0, 0, 0, 0.3);
+            --shadow-2xl: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
+        }
+    }
+    
+    /* Force Streamlit to use our theme */
+    .stApp, .stApp > div, .main .block-container {
+        background: var(--bg-primary) !important;
+        color: var(--text-primary) !important;
+    }
+    
     /* Reset and base styles */
     * {
         margin: 0;
@@ -104,9 +145,9 @@ def load_modern_css():
     }
     
     .stApp {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background: var(--gray-25);
-        color: var(--gray-900);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        background: var(--bg-primary) !important;
+        color: var(--text-primary) !important;
         line-height: 1.5;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -117,6 +158,11 @@ def load_modern_css():
     .stDeployButton { display: none !important; }
     .stToolbar { display: none !important; }
     
+    /* Override Streamlit's dark mode styles */
+    div[data-testid="stSidebar"] {
+        background: var(--bg-secondary) !important;
+    }
+    
     /* Login Page Redesign */
     .login-page {
         display: flex;
@@ -125,12 +171,13 @@ def load_modern_css():
         padding: var(--spacing-xl);
         position: relative;
         overflow: hidden;
+        background: var(--bg-primary) !important;
     }
     
     .login-container {
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--bg-card) !important;
         backdrop-filter: blur(20px);
-        border: 1px solid var(--gray-200);
+        border: 1px solid var(--border-primary);
         border-radius: var(--radius-3xl);
         padding: var(--spacing-2xl);
         max-width: 480px;
@@ -173,61 +220,89 @@ def load_modern_css():
     }
     
     .login-subtitle {
-        color: var(--gray-600);
+        color: var(--text-tertiary) !important;
         font-size: 1rem;
         font-weight: 400;
         line-height: 1.6;
     }
     
-    /* Form Styles */
-    .stTextInput > div > div > input {
-        background: var(--gray-25);
-        border: 2px solid var(--gray-200);
-        border-radius: var(--radius-xl);
-        padding: var(--spacing-lg) var(--spacing-xl);
-        font-size: 1rem;
-        font-weight: 500;
-        color: var(--gray-900);
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: var(--shadow-xs);
-        width: 100%;
+    /* Form Styles - Enhanced for dark mode */
+    .stTextInput > div > div > input,
+    .stTextInput input {
+        background: var(--bg-input) !important;
+        border: 2px solid var(--border-primary) !important;
+        border-radius: var(--radius-xl) !important;
+        padding: var(--spacing-lg) var(--spacing-xl) !important;
+        font-size: 1rem !important;
+        font-weight: 500 !important;
+        color: var(--text-primary) !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: var(--shadow-xs) !important;
+        width: 100% !important;
     }
     
-    .stTextInput > div > div > input:focus {
-        border-color: var(--primary-500);
-        box-shadow: 0 0 0 4px var(--primary-100), var(--shadow-sm);
-        outline: none;
-        background: white;
+    .stTextInput > div > div > input:focus,
+    .stTextInput input:focus {
+        border-color: var(--border-focus) !important;
+        box-shadow: 0 0 0 4px var(--primary-100), var(--shadow-sm) !important;
+        outline: none !important;
+        background: var(--bg-input-focus) !important;
+    }
+    
+    .stTextInput > div > div > input::placeholder,
+    .stTextInput input::placeholder {
+        color: var(--text-muted) !important;
+        opacity: 0.8 !important;
+    }
+    
+    /* Text Area Styles */
+    .stTextArea textarea {
+        background: var(--bg-input) !important;
+        border: 2px solid var(--border-primary) !important;
+        border-radius: var(--radius-xl) !important;
+        color: var(--text-primary) !important;
+        padding: var(--spacing-lg) !important;
+    }
+    
+    .stTextArea textarea:focus {
+        border-color: var(--border-focus) !important;
+        box-shadow: 0 0 0 4px var(--primary-100), var(--shadow-sm) !important;
+        background: var(--bg-input-focus) !important;
+    }
+    
+    .stTextArea textarea::placeholder {
+        color: var(--text-muted) !important;
+        opacity: 0.8 !important;
     }
     
     /* Modern Button Styles */
     .stButton > button {
-        background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
-        color: white;
-        border: none;
-        border-radius: var(--radius-xl);
-        padding: var(--spacing-lg) var(--spacing-2xl);
-        font-size: 1rem;
-        font-weight: 600;
-        font-family: inherit;
-        cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: var(--shadow-sm);
-        position: relative;
-        overflow: hidden;
-        width: 100%;
-        height: 48px;
+        background: linear-gradient(135deg, var(--primary-600), var(--primary-700)) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: var(--radius-xl) !important;
+        padding: var(--spacing-lg) var(--spacing-2xl) !important;
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+        font-family: inherit !important;
+        cursor: pointer !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: var(--shadow-sm) !important;
+        position: relative !important;
+        overflow: hidden !important;
+        width: 100% !important;
+        height: 48px !important;
     }
     
     .stButton > button:hover {
-        background: linear-gradient(135deg, var(--primary-700), var(--primary-800));
-        box-shadow: var(--shadow-lg);
-        transform: translateY(-2px);
+        background: linear-gradient(135deg, var(--primary-700), var(--primary-800)) !important;
+        box-shadow: var(--shadow-lg) !important;
+        transform: translateY(-2px) !important;
     }
     
     /* App Header Redesign */
     .app-header {
-        background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-800) 100%);
+        background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-800) 100%) !important;
         padding: var(--spacing-4xl) var(--spacing-3xl);
         margin: -1rem -2rem var(--spacing-3xl) -2rem;
         border-radius: 0 0 var(--radius-3xl) var(--radius-3xl);
@@ -242,7 +317,7 @@ def load_modern_css():
         display: flex;
         justify-content: space-between;
         align-items: center;
-        color: white;
+        color: white !important;
     }
     
     .brand-section {
@@ -263,21 +338,24 @@ def load_modern_css():
         justify-content: center;
         font-size: 1.5rem;
         box-shadow: var(--shadow-md);
+        color: white !important;
     }
     
     .brand-text h1 {
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin: 0;
-        letter-spacing: -0.02em;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        font-size: 2.5rem !important;
+        font-weight: 800 !important;
+        margin: 0 !important;
+        letter-spacing: -0.02em !important;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+        color: white !important;
     }
     
     .brand-text p {
-        font-size: 1.125rem;
-        font-weight: 400;
-        margin: var(--spacing-xs) 0 0 0;
-        opacity: 0.9;
+        font-size: 1.125rem !important;
+        font-weight: 400 !important;
+        margin: var(--spacing-xs) 0 0 0 !important;
+        opacity: 0.9 !important;
+        color: white !important;
     }
     
     .user-section {
@@ -303,30 +381,33 @@ def load_modern_css():
         font-weight: 700;
         font-size: 1.25rem;
         border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white !important;
     }
     
     .user-info h4 {
-        margin: 0;
-        font-size: 1rem;
-        font-weight: 600;
+        margin: 0 !important;
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+        color: white !important;
     }
     
     .user-info p {
-        margin: 0;
-        font-size: 0.875rem;
-        opacity: 0.8;
-        font-family: 'JetBrains Mono', monospace;
+        margin: 0 !important;
+        font-size: 0.875rem !important;
+        opacity: 0.8 !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        color: white !important;
     }
     
     /* Modern Card Design */
     .modern-card {
-        background: white;
-        border: 1px solid var(--gray-200);
-        border-radius: var(--radius-2xl);
-        padding: var(--spacing-4xl);
-        margin-bottom: var(--spacing-3xl);
-        box-shadow: var(--shadow-sm);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: var(--bg-secondary) !important;
+        border: 1px solid var(--border-primary) !important;
+        border-radius: var(--radius-2xl) !important;
+        padding: var(--spacing-4xl) !important;
+        margin-bottom: var(--spacing-3xl) !important;
+        box-shadow: var(--shadow-sm) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         position: relative;
         overflow: hidden;
     }
@@ -348,7 +429,7 @@ def load_modern_css():
         gap: var(--spacing-xl);
         margin-bottom: var(--spacing-3xl);
         padding-bottom: var(--spacing-2xl);
-        border-bottom: 1px solid var(--gray-100);
+        border-bottom: 1px solid var(--border-primary);
     }
     
     .card-icon {
@@ -359,64 +440,64 @@ def load_modern_css():
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
+        color: white !important;
         font-size: 1.5rem;
         font-weight: 700;
         box-shadow: var(--shadow-md);
     }
     
     .card-content h2 {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--gray-900);
-        margin: 0 0 var(--spacing-sm) 0;
-        letter-spacing: -0.01em;
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        color: var(--text-primary) !important;
+        margin: 0 0 var(--spacing-sm) 0 !important;
+        letter-spacing: -0.01em !important;
     }
     
     .card-content p {
-        font-size: 1rem;
-        color: var(--gray-600);
-        margin: 0;
-        line-height: 1.6;
+        font-size: 1rem !important;
+        color: var(--text-tertiary) !important;
+        margin: 0 !important;
+        line-height: 1.6 !important;
     }
     
     /* Status Badge */
     .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--spacing-sm);
-        background: linear-gradient(135deg, var(--success-500), var(--success-600));
-        color: white;
-        padding: var(--spacing-md) var(--spacing-xl);
-        border-radius: var(--radius-full);
-        font-size: 0.875rem;
-        font-weight: 600;
-        box-shadow: var(--shadow-sm);
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: var(--spacing-sm) !important;
+        background: linear-gradient(135deg, var(--success-500), var(--success-600)) !important;
+        color: white !important;
+        padding: var(--spacing-md) var(--spacing-xl) !important;
+        border-radius: var(--radius-full) !important;
+        font-size: 0.875rem !important;
+        font-weight: 600 !important;
+        box-shadow: var(--shadow-sm) !important;
     }
     
     .status-indicator {
-        width: 8px;
-        height: 8px;
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: var(--radius-full);
+        width: 8px !important;
+        height: 8px !important;
+        background: rgba(255, 255, 255, 0.9) !important;
+        border-radius: var(--radius-full) !important;
     }
     
     /* Metric Cards */
     .metric-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: var(--spacing-xl);
-        margin: var(--spacing-3xl) 0;
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+        gap: var(--spacing-xl) !important;
+        margin: var(--spacing-3xl) 0 !important;
     }
     
     .metric-card {
-        background: linear-gradient(135deg, var(--gray-25) 0%, white 100%);
-        border: 1px solid var(--gray-200);
-        border-radius: var(--radius-2xl);
-        padding: var(--spacing-3xl);
-        text-align: center;
-        box-shadow: var(--shadow-xs);
-        transition: all 0.2s ease;
+        background: var(--bg-gradient) !important;
+        border: 1px solid var(--border-primary) !important;
+        border-radius: var(--radius-2xl) !important;
+        padding: var(--spacing-3xl) !important;
+        text-align: center !important;
+        box-shadow: var(--shadow-xs) !important;
+        transition: all 0.2s ease !important;
         position: relative;
         overflow: hidden;
     }
@@ -432,89 +513,185 @@ def load_modern_css():
     }
     
     .metric-value {
-        font-size: 2.5rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin: 0;
-        line-height: 1;
-        font-family: 'JetBrains Mono', monospace;
+        font-size: 2.5rem !important;
+        font-weight: 800 !important;
+        background: linear-gradient(135deg, var(--primary-600), var(--primary-700)) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
+        margin: 0 !important;
+        line-height: 1 !important;
+        font-family: 'JetBrains Mono', monospace !important;
     }
     
     .metric-label {
-        font-size: 0.875rem;
-        color: var(--gray-600);
-        margin-top: var(--spacing-md);
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+        font-size: 0.875rem !important;
+        color: var(--text-tertiary) !important;
+        margin-top: var(--spacing-md) !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
     }
     
     /* Query Response */
     .query-response {
-        background: linear-gradient(135deg, var(--primary-25) 0%, var(--primary-50) 100%);
-        border: 1px solid var(--primary-200);
-        border-radius: var(--radius-2xl);
-        padding: var(--spacing-4xl);
-        margin-top: var(--spacing-3xl);
+        background: var(--bg-secondary) !important;
+        border: 1px solid var(--primary-200) !important;
+        border-radius: var(--radius-2xl) !important;
+        padding: var(--spacing-4xl) !important;
+        margin-top: var(--spacing-3xl) !important;
         position: relative;
-        box-shadow: var(--shadow-sm);
+        box-shadow: var(--shadow-sm) !important;
     }
     
     .response-header {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--primary-800);
-        margin: 0 0 var(--spacing-xl) 0;
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-md);
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        color: var(--primary-600) !important;
+        margin: 0 0 var(--spacing-xl) 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: var(--spacing-md) !important;
     }
     
     .query-preview {
-        background: rgba(255, 255, 255, 0.8);
-        border: 1px solid var(--primary-200);
-        border-radius: var(--radius-lg);
-        padding: var(--spacing-lg);
-        margin-bottom: var(--spacing-xl);
-        font-size: 0.9rem;
-        color: var(--gray-700);
-        font-style: italic;
+        background: var(--bg-tertiary) !important;
+        border: 1px solid var(--border-primary) !important;
+        border-radius: var(--radius-lg) !important;
+        padding: var(--spacing-lg) !important;
+        margin-bottom: var(--spacing-xl) !important;
+        font-size: 0.9rem !important;
+        color: var(--text-secondary) !important;
+        font-style: italic !important;
     }
     
     /* Meeting Link Styles */
     .meeting-link-container {
-        background: linear-gradient(135deg, var(--success-25) 0%, var(--success-50) 100%);
-        border: 1px solid var(--success-200);
-        border-radius: var(--radius-2xl);
-        padding: var(--spacing-4xl);
-        margin-top: var(--spacing-3xl);
+        background: var(--bg-secondary) !important;
+        border: 1px solid var(--success-200) !important;
+        border-radius: var(--radius-2xl) !important;
+        padding: var(--spacing-4xl) !important;
+        margin-top: var(--spacing-3xl) !important;
         position: relative;
-        box-shadow: var(--shadow-sm);
+        box-shadow: var(--shadow-sm) !important;
     }
     
     .meeting-link-header {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--success-800);
-        margin: 0 0 var(--spacing-xl) 0;
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-md);
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        color: var(--success-600) !important;
+        margin: 0 0 var(--spacing-xl) 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: var(--spacing-md) !important;
+    }
+    
+    /* Streamlit Tabs styling */
+    .stTabs [data-baseweb="tab-list"] {
+        background: var(--bg-secondary) !important;
+        border-radius: var(--radius-xl) !important;
+        padding: var(--spacing-sm) !important;
+        border: 1px solid var(--border-primary) !important;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background: transparent !important;
+        border-radius: var(--radius-lg) !important;
+        color: var(--text-tertiary) !important;
+        font-weight: 500 !important;
+        padding: var(--spacing-md) var(--spacing-lg) !important;
+        border: none !important;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: var(--primary-500) !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+    
+    /* File uploader styling */
+    .stFileUploader {
+        background: var(--bg-input) !important;
+        border: 2px dashed var(--border-primary) !important;
+        border-radius: var(--radius-xl) !important;
+        padding: var(--spacing-2xl) !important;
+    }
+    
+    .stFileUploader:hover {
+        border-color: var(--primary-400) !important;
+    }
+    
+    /* Success/Error messages */
+    .stSuccess {
+        background: var(--success-50) !important;
+        border: 1px solid var(--success-500) !important;
+        color: var(--success-600) !important;
+    }
+    
+    .stError {
+        background: var(--error-50) !important;
+        border: 1px solid var(--error-500) !important;
+        color: var(--error-600) !important;
+    }
+    
+    .stWarning {
+        background: var(--warning-50) !important;
+        border: 1px solid var(--warning-500) !important;
+        color: var(--warning-600) !important;
     }
     
     /* Responsive Design */
     @media (max-width: 768px) {
-        .login-container { padding: var(--spacing-3xl); }
-        .app-header { padding: var(--spacing-3xl) var(--spacing-xl); margin: -1rem -1rem var(--spacing-xl) -1rem; }
-        .brand-text h1 { font-size: 2rem; }
-        .modern-card { padding: var(--spacing-3xl); }
-        .app-header-content { flex-direction: column; gap: var(--spacing-xl); text-align: center; }
-        .user-section { flex-direction: column; text-align: center; }
-        .card-header { flex-direction: column; text-align: center; }
-        .metric-grid { grid-template-columns: 1fr; }
+        .login-container { 
+            padding: var(--spacing-3xl) !important; 
+            margin: var(--spacing-lg) !important;
+        }
+        .app-header { 
+            padding: var(--spacing-3xl) var(--spacing-xl) !important; 
+            margin: -1rem -1rem var(--spacing-xl) -1rem !important; 
+        }
+        .brand-text h1 { 
+            font-size: 2rem !important; 
+        }
+        .modern-card { 
+            padding: var(--spacing-3xl) !important; 
+        }
+        .app-header-content { 
+            flex-direction: column !important; 
+            gap: var(--spacing-xl) !important; 
+            text-align: center !important; 
+        }
+        .user-section { 
+            flex-direction: column !important; 
+            text-align: center !important; 
+        }
+        .card-header { 
+            flex-direction: column !important; 
+            text-align: center !important; 
+        }
+        .metric-grid { 
+            grid-template-columns: 1fr !important; 
+        }
+    }
+    
+    /* Override any conflicting Streamlit styles */
+    div[data-testid="stMarkdownContainer"] p {
+        color: var(--text-primary) !important;
+    }
+    
+    div[data-testid="stMarkdownContainer"] h1,
+    div[data-testid="stMarkdownContainer"] h2,
+    div[data-testid="stMarkdownContainer"] h3,
+    div[data-testid="stMarkdownContainer"] h4 {
+        color: var(--text-primary) !important;
+    }
+    
+    /* Ensure labels are visible in dark mode */
+    .stTextInput > label,
+    .stTextArea > label,
+    .stFileUploader > label {
+        color: var(--text-secondary) !important;
+        font-weight: 500 !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -705,22 +882,24 @@ def get_intake_status(intake_id: str) -> Optional[dict]:
         return None
 
 def query_insights(query: str) -> Optional[dict]:
-    """Query insights from the copilot"""
+    """Query insights from the API using the /api/query endpoint"""
     try:
         headers = {
             "x-org-id": str(st.session_state.org_id),
-            "Authorization": f"Bearer {st.session_state.password}",
             "Content-Type": "application/json"
         }
         
-        data = {"query": query}
+        data = {"question": query}  
         
-        response = requests.post(f"{API_BASE_URL}/api/copilot/query", headers=headers, json=data)
+        # Updated endpoint to match the curl command
+        response = requests.post(f"{API_BASE_URL}/api/query", headers=headers, json=data)
         
         if response.status_code == 200:
             return response.json()
         else:
             st.error(f"❌ Failed to query insights: {response.status_code}")
+            if response.text:
+                st.error(f"Response: {response.text}")
             return None
     except Exception as e:
         st.error(f"❌ Error querying insights: {str(e)}")
@@ -919,7 +1098,7 @@ def main_app():
                         st.markdown(f"""
                         <div class="metric-card">
                             <div class="metric-label">File Name</div>
-                            <div style="font-weight: 600; color: var(--gray-900); font-size: 0.9rem; margin-top: 0.5rem; word-break: break-all;">
+                            <div style="font-weight: 600; color: var(--text-primary); font-size: 0.9rem; margin-top: 0.5rem; word-break: break-all;">
                                 {uploaded_file.name}
                             </div>
                         </div>
@@ -1008,8 +1187,8 @@ def main_app():
             st.markdown("""
             <div class="modern-card">
                 <div style="text-align: center; padding: 2rem 0;">
-                    <h3 style="color: var(--gray-600); margin-bottom: 1rem;">📥 Ready to Start?</h3>
-                    <p style="color: var(--gray-500); margin-bottom: 2rem;">Initialize an intake session above to begin uploading and analyzing your content.</p>
+                    <h3 style="color: var(--text-tertiary); margin-bottom: 1rem;">📥 Ready to Start?</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 2rem;">Initialize an intake session above to begin uploading and analyzing your content.</p>
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -1029,14 +1208,14 @@ def main_app():
         # Query input with better UX
         query_text = st.text_area(
             "Ask a question about your data",
-            placeholder="Ask questions",
+            placeholder="Ask questions about your uploaded content...",
             height=150,
             help="Ask specific questions about your uploaded content to get AI-powered insights"
         )
         
         col1, col2 = st.columns([3, 1])
         with col1:
-            query_btn = st.button("🔍 Get AI Insights", key="query_btn", disabled=not query_text.strip(), use_container_width=True)
+            query_btn = st.button("Get AI Insights", key="query_btn", disabled=not query_text.strip(), use_container_width=True)
         
         with col2:
             if hasattr(st.session_state, 'last_query_response'):
@@ -1096,14 +1275,14 @@ def main_app():
         if st.session_state.intake_initialized:
             # Current session info
             st.markdown(f"""
-            <div style="background: linear-gradient(135deg, var(--primary-25) 0%, var(--primary-50) 100%); 
+            <div style="background: var(--bg-secondary); 
                         border: 1px solid var(--primary-200); 
                         border-radius: var(--radius-2xl); 
                         padding: var(--spacing-3xl); 
                         margin-bottom: var(--spacing-3xl);
                         position: relative;">
-                <h4 style="margin: 0 0 var(--spacing-md) 0; color: var(--primary-800); font-weight: 700;">🎯 Current Session</h4>
-                <p style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: var(--gray-700); background: rgba(255,255,255,0.7); padding: var(--spacing-md); border-radius: var(--radius-lg);">
+                <h4 style="margin: 0 0 var(--spacing-md) 0; color: var(--primary-600); font-weight: 700;">🎯 Current Session</h4>
+                <p style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: var(--text-secondary); background: var(--bg-tertiary); padding: var(--spacing-md); border-radius: var(--radius-lg);">
                     <strong>Intake ID:</strong> {st.session_state.intake_id}
                 </p>
             </div>
@@ -1176,9 +1355,9 @@ def main_app():
         
         else:
             st.markdown("""
-            <div style="text-align: center; padding: var(--spacing-4xl) 0; background: var(--gray-25); border-radius: var(--radius-2xl); border: 1px solid var(--gray-200);">
-                <h3 style="color: var(--gray-600); margin-bottom: var(--spacing-lg);">🎯 No Active Session</h3>
-                <p style="color: var(--gray-500); margin-bottom: var(--spacing-2xl);">Initialize an intake session in the 'Data Intake' tab to access management features.</p>
+            <div style="text-align: center; padding: var(--spacing-4xl) 0; background: var(--bg-tertiary); border-radius: var(--radius-2xl); border: 1px solid var(--border-primary);">
+                <h3 style="color: var(--text-tertiary); margin-bottom: var(--spacing-lg);">🎯 No Active Session</h3>
+                <p style="color: var(--text-muted); margin-bottom: var(--spacing-2xl);">Initialize an intake session in the 'Data Intake' tab to access management features.</p>
             """, unsafe_allow_html=True)
             
             col1, col2, col3 = st.columns([1, 2, 1])
@@ -1210,15 +1389,15 @@ def main_app():
                 **💻 Platform:** Streamlit Cloud
                 """)
 
-    # NEW MEETING ASSISTANT TAB
+    # Meeting Assistant Tab
     with tab4:
         st.markdown("""
         <div class="modern-card">
             <div class="card-header">
                 <div class="card-icon">🤖</div>
                 <div class="card-content">
-                    <h2>Meeting Assistant - Add Scooby</h2>
-                    <p>Add Scooby AI assistant to your meetings for automatic note-taking and insights generation</p>
+                    <h2>Meeting Assistant</h2>
+                    <p>Add Scooby AI to your meetings for automatic note-taking and intelligent insights</p>
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -1291,9 +1470,9 @@ def main_app():
             
             # Meeting link preview
             st.markdown(f"""
-            <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); 
+            <div style="background: var(--bg-tertiary); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); 
                         padding: var(--spacing-lg); margin: var(--spacing-xl) 0; font-family: 'JetBrains Mono', monospace; 
-                        font-size: 0.9rem; word-break: break-all; color: var(--gray-700);">
+                        font-size: 0.9rem; word-break: break-all; color: var(--text-secondary);">
                 <strong>Meeting Link:</strong><br>{meeting_link}
             </div>
             """, unsafe_allow_html=True)
@@ -1305,95 +1484,7 @@ def main_app():
                     with st.spinner("🤖 Adding Scooby to your meeting..."):
                         if add_scooby_to_meeting(meeting_link):
                             st.balloons()
-                            
-                            # Show success message with additional info
-                            st.markdown("""
-                            <div class="meeting-link-container">
-                                <h3 class="meeting-link-header">🎉 Scooby Successfully Added!</h3>
-                                <div style="background: rgba(255, 255, 255, 0.8); border: 1px solid var(--success-200); 
-                                            border-radius: var(--radius-lg); padding: var(--spacing-lg); margin-top: var(--spacing-xl);">
-                                    <p style="margin: 0; color: var(--success-800); font-weight: 500;">
-                                        ✅ Scooby AI assistant has been successfully added to your meeting.<br>
-                                        📝 Scooby will automatically join and capture meeting notes.<br>
-                                        🔍 You'll receive AI-generated insights after the meeting ends.<br>
-                                        📊 Check your dashboard for meeting summaries and action items.
-                                    </p>
-                                </div>
-                            </div>
-                            """, unsafe_allow_html=True)
         
-        else:
-            # Instructions when no link is provided
-            st.markdown("""
-            <div style="text-align: center; padding: var(--spacing-4xl) 0; background: var(--gray-25); 
-                        border-radius: var(--radius-2xl); border: 1px solid var(--gray-200);">
-                <h3 style="color: var(--gray-600); margin-bottom: var(--spacing-lg);">🔗 Ready to Add Scooby?</h3>
-                <p style="color: var(--gray-500); margin-bottom: var(--spacing-xl);">
-                    Enter your meeting link above to automatically add Scooby AI assistant for note-taking and insights.
-                </p>
-                <div style="background: var(--gray-50); border-radius: var(--radius-lg); padding: var(--spacing-xl); 
-                            margin: 0 var(--spacing-2xl); text-align: left;">
-                    <h4 style="color: var(--gray-700); margin-bottom: var(--spacing-md);">📋 Supported Platforms:</h4>
-                    <p style="color: var(--gray-600); margin: 0; line-height: 1.8;">
-                        📞 Google Meet<br>
-                        💻 Zoom<br>
-                        👥 Microsoft Teams<br>
-                        🎥 Cisco Webex<br>
-                        🔗 And more coming soon!
-                    </p>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-        # Features section
-        st.markdown("""
-        <div class="modern-card">
-            <h3 style="color: var(--gray-900); margin-bottom: var(--spacing-xl);">🌟 Scooby Features</h3>
-        """, unsafe_allow_html=True)
-        
-        st.markdown('<div class="metric-grid">', unsafe_allow_html=True)
-        
-        col1, col2, col3, col4 = st.columns(4)
-        
-        with col1:
-            st.markdown("""
-            <div class="metric-card">
-                <div style="font-size: 2rem; margin-bottom: var(--spacing-md);">📝</div>
-                <h4 style="color: var(--gray-900); font-size: 1rem; margin-bottom: var(--spacing-sm);">Auto Notes</h4>
-                <p style="color: var(--gray-600); font-size: 0.875rem; margin: 0;">Automatic meeting transcription and note-taking</p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            st.markdown("""
-            <div class="metric-card">
-                <div style="font-size: 2rem; margin-bottom: var(--spacing-md);">🧠</div>
-                <h4 style="color: var(--gray-900); font-size: 1rem; margin-bottom: var(--spacing-sm);">AI Insights</h4>
-                <p style="color: var(--gray-600); font-size: 0.875rem; margin: 0;">Smart summaries and key insights extraction</p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col3:
-            st.markdown("""
-            <div class="metric-card">
-                <div style="font-size: 2rem; margin-bottom: var(--spacing-md);">✅</div>
-                <h4 style="color: var(--gray-900); font-size: 1rem; margin-bottom: var(--spacing-sm);">Action Items</h4>
-                <p style="color: var(--gray-600); font-size: 0.875rem; margin: 0;">Automatic detection and tracking of action items</p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col4:
-            st.markdown("""
-            <div class="metric-card">
-                <div style="font-size: 2rem; margin-bottom: var(--spacing-md);">📊</div>
-                <h4 style="color: var(--gray-900); font-size: 1rem; margin-bottom: var(--spacing-sm);">Analytics</h4>
-                <p style="color: var(--gray-600); font-size: 0.875rem; margin: 0;">Meeting analytics and participation insights</p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
 def main():
