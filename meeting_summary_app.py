@@ -8,6 +8,7 @@ from supabase import create_client, Client
 
 # Configuration
 API_BASE_URL = "https://dev.pulse-api.getpulseinsights.ai"
+API_BOT_URL = "https://pulse-dev.scooby.getpulseinsights.ai"
 
 # Supabase Configuration
 SUPABASE_URL = st.secrets.get("SUPABASE_URL", "your-supabase-url")
@@ -483,6 +484,27 @@ def load_modern_css():
         font-style: italic;
     }
     
+    /* Meeting Link Styles */
+    .meeting-link-container {
+        background: linear-gradient(135deg, var(--success-25) 0%, var(--success-50) 100%);
+        border: 1px solid var(--success-200);
+        border-radius: var(--radius-2xl);
+        padding: var(--spacing-4xl);
+        margin-top: var(--spacing-3xl);
+        position: relative;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .meeting-link-header {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--success-800);
+        margin: 0 0 var(--spacing-xl) 0;
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+    }
+    
     /* Responsive Design */
     @media (max-width: 768px) {
         .login-container { padding: var(--spacing-3xl); }
@@ -571,11 +593,14 @@ def login_page():
                 st.error("⚠️ Please enter both organization name and password")
             else:
                 with st.spinner("🔐 Authenticating..."):
+                    supabase = init_supabase()
                     is_authenticated, org_id = authenticate_user(org_name, password)
+                    tenant_id=supabase.table("org_directory").select("tenant_id").eq("org_id", org_id).execute()
                     if is_authenticated:
                         st.session_state.authenticated = True
                         st.session_state.org_name = org_name
                         st.session_state.org_id = org_id
+                        st.session_state.tenant_id=tenant_id
                         st.session_state.password = password
                         st.success("✅ Login successful! Redirecting...")
                         time.sleep(1)
@@ -701,6 +726,35 @@ def query_insights(query: str) -> Optional[dict]:
         st.error(f"❌ Error querying insights: {str(e)}")
         return None
 
+def add_scooby_to_meeting(meeting_link: str) -> bool:
+    """Add Scooby to the meeting using the provided endpoint"""
+    try:
+        headers = {
+            "Authorization": f"Bearer {st.session_state.org_id}",
+            "Content-Type": "application/json"
+        }
+        
+        data = {
+            "meeting_url": meeting_link,
+            "x_org_id": str(st.session_state.org_id) if st.session_state.org_id else "",
+            "tenant_id": str(st.session_state.tenant_id) if st.session_state.tenant_id else "",
+            "isTranscript": True,
+            "saveTranscript": True
+        }
+        
+        response = requests.post(f"{API_BOT_URL}/add_scooby", headers=headers, json=data)
+        
+        if response.status_code == 200:
+            st.success("✅ Scooby has been successfully added to your meeting!")
+            return True
+        else:
+            error_data = response.json() if response.headers.get('content-type') == 'application/json' else response.text
+            st.error(f"❌ Failed to add Scooby to meeting: {response.status_code}\n{error_data}")
+            return False
+    except Exception as e:
+        st.error(f"❌ Error adding Scooby to meeting: {str(e)}")
+        return False
+
 def finalize_intake(intake_id: str) -> bool:
     """Finalize the intake"""
     try:
@@ -791,8 +845,8 @@ def main_app():
     if "idempotency_key" not in st.session_state:
         st.session_state.idempotency_key = None
     
-    # Modern tabs
-    tab1, tab2, tab3 = st.tabs(["📥 Data Intake", "🔍 Query Insights", "⚙️ Management"])
+    # Modern tabs with Meeting Assistant
+    tab1, tab2, tab3, tab4 = st.tabs(["📥 Data Intake", "🔍 Query Insights", "⚙️ Management", "🤖 Meeting Assistant"])
     
     with tab1:
         # Step 1: Initialize Intake
@@ -975,7 +1029,7 @@ def main_app():
         # Query input with better UX
         query_text = st.text_area(
             "Ask a question about your data",
-            placeholder="Ask questions about your uploaded content to get AI-powered insights...\n\nExample questions:\n- What are the key findings from the uploaded documents?\n- Summarize the main points from our meeting notes\n- What action items were identified?\n- What are the biggest risks mentioned?",
+            placeholder="Ask questions",
             height=150,
             help="Ask specific questions about your uploaded content to get AI-powered insights"
         )
@@ -1155,6 +1209,192 @@ def main_app():
                 **🔐 Authentication:** Active ✅  
                 **💻 Platform:** Streamlit Cloud
                 """)
+
+    # NEW MEETING ASSISTANT TAB
+    with tab4:
+        st.markdown("""
+        <div class="modern-card">
+            <div class="card-header">
+                <div class="card-icon">🤖</div>
+                <div class="card-content">
+                    <h2>Meeting Assistant - Add Scooby</h2>
+                    <p>Add Scooby AI assistant to your meetings for automatic note-taking and insights generation</p>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Meeting link input section
+        st.markdown("#### 🔗 Meeting Details")
+        st.write("Enter your meeting link below to add Scooby AI assistant to automatically capture notes and generate insights.")
+        
+        meeting_link = st.text_input(
+            "Meeting Link",
+            placeholder="https://meet.google.com/xyz-abcd-123 or https://zoom.us/j/1234567890",
+            help="Enter the full meeting URL (Google Meet, Zoom, Microsoft Teams, etc.)",
+            key="meeting_link_input"
+        )
+        
+        # Display meeting link info if provided
+        if meeting_link.strip():
+            st.markdown('<div class="metric-grid">', unsafe_allow_html=True)
+            
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                # Detect meeting platform
+                platform = "Unknown"
+                platform_icon = "🔗"
+                if "meet.google.com" in meeting_link.lower():
+                    platform = "Google Meet"
+                    platform_icon = "📞"
+                elif "zoom.us" in meeting_link.lower():
+                    platform = "Zoom"
+                    platform_icon = "💻"
+                elif "teams.microsoft.com" in meeting_link.lower():
+                    platform = "Microsoft Teams" 
+                    platform_icon = "👥"
+                elif "webex" in meeting_link.lower():
+                    platform = "Webex"
+                    platform_icon = "🎥"
+                
+                st.markdown(f"""
+                <div class="metric-card">
+                    <div class="metric-value">{platform_icon}</div>
+                    <div class="metric-label">{platform}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col2:
+                # Meeting link validation
+                is_valid = any(domain in meeting_link.lower() for domain in ['meet.google.com', 'zoom.us', 'teams.microsoft.com', 'webex'])
+                status_icon = "✅" if is_valid else "⚠️"
+                status_text = "Valid" if is_valid else "Check Link"
+                
+                st.markdown(f"""
+                <div class="metric-card">
+                    <div class="metric-value">{status_icon}</div>
+                    <div class="metric-label">{status_text}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col3:
+                # Link length indicator
+                link_length = len(meeting_link)
+                st.markdown(f"""
+                <div class="metric-card">
+                    <div class="metric-value">{link_length}</div>
+                    <div class="metric-label">Characters</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Meeting link preview
+            st.markdown(f"""
+            <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); 
+                        padding: var(--spacing-lg); margin: var(--spacing-xl) 0; font-family: 'JetBrains Mono', monospace; 
+                        font-size: 0.9rem; word-break: break-all; color: var(--gray-700);">
+                <strong>Meeting Link:</strong><br>{meeting_link}
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Add Scooby button
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                if st.button("🤖 Add Scooby to Meeting", key="add_scooby_btn", use_container_width=True, disabled=not meeting_link.strip()):
+                    with st.spinner("🤖 Adding Scooby to your meeting..."):
+                        if add_scooby_to_meeting(meeting_link):
+                            st.balloons()
+                            
+                            # Show success message with additional info
+                            st.markdown("""
+                            <div class="meeting-link-container">
+                                <h3 class="meeting-link-header">🎉 Scooby Successfully Added!</h3>
+                                <div style="background: rgba(255, 255, 255, 0.8); border: 1px solid var(--success-200); 
+                                            border-radius: var(--radius-lg); padding: var(--spacing-lg); margin-top: var(--spacing-xl);">
+                                    <p style="margin: 0; color: var(--success-800); font-weight: 500;">
+                                        ✅ Scooby AI assistant has been successfully added to your meeting.<br>
+                                        📝 Scooby will automatically join and capture meeting notes.<br>
+                                        🔍 You'll receive AI-generated insights after the meeting ends.<br>
+                                        📊 Check your dashboard for meeting summaries and action items.
+                                    </p>
+                                </div>
+                            </div>
+                            """, unsafe_allow_html=True)
+        
+        else:
+            # Instructions when no link is provided
+            st.markdown("""
+            <div style="text-align: center; padding: var(--spacing-4xl) 0; background: var(--gray-25); 
+                        border-radius: var(--radius-2xl); border: 1px solid var(--gray-200);">
+                <h3 style="color: var(--gray-600); margin-bottom: var(--spacing-lg);">🔗 Ready to Add Scooby?</h3>
+                <p style="color: var(--gray-500); margin-bottom: var(--spacing-xl);">
+                    Enter your meeting link above to automatically add Scooby AI assistant for note-taking and insights.
+                </p>
+                <div style="background: var(--gray-50); border-radius: var(--radius-lg); padding: var(--spacing-xl); 
+                            margin: 0 var(--spacing-2xl); text-align: left;">
+                    <h4 style="color: var(--gray-700); margin-bottom: var(--spacing-md);">📋 Supported Platforms:</h4>
+                    <p style="color: var(--gray-600); margin: 0; line-height: 1.8;">
+                        📞 Google Meet<br>
+                        💻 Zoom<br>
+                        👥 Microsoft Teams<br>
+                        🎥 Cisco Webex<br>
+                        🔗 And more coming soon!
+                    </p>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+        # Features section
+        st.markdown("""
+        <div class="modern-card">
+            <h3 style="color: var(--gray-900); margin-bottom: var(--spacing-xl);">🌟 Scooby Features</h3>
+        """, unsafe_allow_html=True)
+        
+        st.markdown('<div class="metric-grid">', unsafe_allow_html=True)
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.markdown("""
+            <div class="metric-card">
+                <div style="font-size: 2rem; margin-bottom: var(--spacing-md);">📝</div>
+                <h4 style="color: var(--gray-900); font-size: 1rem; margin-bottom: var(--spacing-sm);">Auto Notes</h4>
+                <p style="color: var(--gray-600); font-size: 0.875rem; margin: 0;">Automatic meeting transcription and note-taking</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("""
+            <div class="metric-card">
+                <div style="font-size: 2rem; margin-bottom: var(--spacing-md);">🧠</div>
+                <h4 style="color: var(--gray-900); font-size: 1rem; margin-bottom: var(--spacing-sm);">AI Insights</h4>
+                <p style="color: var(--gray-600); font-size: 0.875rem; margin: 0;">Smart summaries and key insights extraction</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown("""
+            <div class="metric-card">
+                <div style="font-size: 2rem; margin-bottom: var(--spacing-md);">✅</div>
+                <h4 style="color: var(--gray-900); font-size: 1rem; margin-bottom: var(--spacing-sm);">Action Items</h4>
+                <p style="color: var(--gray-600); font-size: 0.875rem; margin: 0;">Automatic detection and tracking of action items</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col4:
+            st.markdown("""
+            <div class="metric-card">
+                <div style="font-size: 2rem; margin-bottom: var(--spacing-md);">📊</div>
+                <h4 style="color: var(--gray-900); font-size: 1rem; margin-bottom: var(--spacing-sm);">Analytics</h4>
+                <p style="color: var(--gray-600); font-size: 0.875rem; margin: 0;">Meeting analytics and participation insights</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 def main():
     """Main function to route between login and app"""
