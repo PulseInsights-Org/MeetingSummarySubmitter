@@ -5,6 +5,7 @@ import time
 import json
 from typing import Optional
 from supabase import create_client, Client
+from intakes_history import intakes_history_tab
 
 # Configuration
 API_BASE_URL = "https://dev.pulse-api.getpulseinsights.ai"
@@ -831,7 +832,7 @@ def main_app():
         st.session_state.idempotency_key = None
     
     # Clean tabs - now with merged Data Intake & Management tab
-    tab1, tab2, tab3 = st.tabs(["Data Intake & Management", "Query Insights", "Meeting Assistant"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Data Intake & Management", "Intakes History", "Query Insights", "Meeting Assistant"])
     
     with tab1:
         # Step 1: Initialize Intake
@@ -1036,6 +1037,9 @@ def main_app():
             """, unsafe_allow_html=True)
     
     with tab2:
+        intakes_history_tab()
+
+    with tab3:
         st.markdown("""
         <div class="card">
             <div class="card-header">
@@ -1099,7 +1103,7 @@ def main_app():
                 st.markdown(str(response))
 
     # Meeting Assistant Tab
-    with tab3:
+    with tab4:
         st.markdown("""
         <div class="card">
             <div class="card-header">
