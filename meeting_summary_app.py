@@ -448,6 +448,25 @@ def load_modern_css():
         margin: 0 0 1.5rem 0;
     }
     
+    /* Section divider */
+    .section-divider {
+        margin: 3rem 0 2rem 0;
+        border: none;
+        border-top: 2px solid var(--border);
+        position: relative;
+    }
+    
+    .section-divider::after {
+        content: '';
+        position: absolute;
+        top: -1px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 2px;
+        background: var(--primary);
+    }
+    
     /* Responsive */
     @media (max-width: 768px) {
         .login-container {
@@ -783,7 +802,6 @@ def main_app():
         <div class="header-content">
             <div class="brand-section">
                 <h1>Pulse Copilot</h1>
-                <p>AI-powered insights for your organization</p>
             </div>
             <div class="user-section">
                 <div class="user-avatar">{org_initial}</div>
@@ -812,8 +830,8 @@ def main_app():
     if "idempotency_key" not in st.session_state:
         st.session_state.idempotency_key = None
     
-    # Clean tabs without excessive icons
-    tab1, tab2, tab3, tab4 = st.tabs(["Data Intake", "Query Insights", "Management", "Meeting Assistant"])
+    # Clean tabs - now with merged Data Intake & Management tab
+    tab1, tab2, tab3 = st.tabs(["Data Intake & Management", "Query Insights", "Meeting Assistant"])
     
     with tab1:
         # Step 1: Initialize Intake
@@ -821,7 +839,7 @@ def main_app():
         <div class="card">
             <div class="card-header">
                 <h2>Initialize Intake Session</h2>
-                <p>Start a new session to upload and analyze your content with AI-powered insights</p>
+                <p>Start a new session to upload your meetings transcript to Pulse</p>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -852,7 +870,7 @@ def main_app():
             <div class="card">
                 <div class="card-header">
                     <h2>Upload Your Content</h2>
-                    <p>Add documents, files, or text content for AI analysis and insights generation</p>
+                    <p>Add documents, files, or text content to Pulse</p>
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -962,6 +980,53 @@ def main_app():
                             with st.spinner("Processing and analyzing your text..."):
                                 if upload_text(st.session_state.intake_id, text_content):
                                     st.rerun()
+            
+            # Management Section - Divider
+            st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
+            
+            # Management Section
+            st.markdown("""
+            <div class="card">
+                <div class="card-header">
+                    <h2>Session Management</h2>
+                    <p>Manage your current intake session and finalize your data to add it to the Pulse knowledge base</p>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Current session info
+            st.markdown(f"""
+            <div style="background: var(--bg-secondary); 
+                        border: 1px solid var(--border); 
+                        border-radius: var(--radius-lg); 
+                        padding: 1.5rem; 
+                        margin-bottom: 1.5rem;">
+                <h4 style="margin: 0 0 0.5rem 0; color: var(--primary); font-weight: 600;">Current Session</h4>
+                <p style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; color: var(--text-secondary); background: var(--bg-tertiary); padding: 0.75rem; border-radius: var(--radius); border: 1px solid var(--border-light);">
+                    <strong>Intake ID:</strong> {st.session_state.intake_id}
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Action buttons
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                if st.button("Check Status", key="status_btn", use_container_width=True):
+                    with st.spinner("Retrieving intake status..."):
+                        status = get_intake_status(st.session_state.intake_id)
+                        if status:
+                            st.json(status)
+            
+            with col2:
+                if st.button("Finalize Intake", key="finalize_btn", use_container_width=True):
+                    with st.spinner("Finalizing intake session..."):
+                        finalize_intake(st.session_state.intake_id)
+            
+            with col3:
+                if st.button("Reset Session", key="reset_btn", use_container_width=True):
+                    reset_session()
+        
         else:
             st.markdown("""
             <div class="empty-state">
@@ -975,7 +1040,7 @@ def main_app():
         <div class="card">
             <div class="card-header">
                 <h2>Query AI Insights</h2>
-                <p>Ask questions about your data and get intelligent, contextual insights powered by AI</p>
+                <p>Ask questions about your data and get intelligent, contextual insights powered by Pulse</p>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -1032,140 +1097,21 @@ def main_app():
                     st.json(response)
             else:
                 st.markdown(str(response))
-    
+
+    # Meeting Assistant Tab
     with tab3:
         st.markdown("""
         <div class="card">
             <div class="card-header">
-                <h2>Session Management</h2>
-                <p>Manage your current intake session, view statistics, and system information</p>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        if st.session_state.intake_initialized:
-            # Current session info
-            st.markdown(f"""
-            <div style="background: var(--bg-secondary); 
-                        border: 1px solid var(--border); 
-                        border-radius: var(--radius-lg); 
-                        padding: 1.5rem; 
-                        margin-bottom: 1.5rem;">
-                <h4 style="margin: 0 0 0.5rem 0; color: var(--primary); font-weight: 600;">Current Session</h4>
-                <p style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; color: var(--text-secondary); background: var(--bg-tertiary); padding: 0.75rem; border-radius: var(--radius); border: 1px solid var(--border-light);">
-                    <strong>Intake ID:</strong> {st.session_state.intake_id}
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Action buttons
-            col1, col2, col3 = st.columns(3)
-            
-            with col1:
-                if st.button("Check Status", key="status_btn", use_container_width=True):
-                    with st.spinner("Retrieving intake status..."):
-                        status = get_intake_status(st.session_state.intake_id)
-                        if status:
-                            st.json(status)
-            
-            with col2:
-                if st.button("Finalize Intake", key="finalize_btn", use_container_width=True):
-                    with st.spinner("Finalizing intake session..."):
-                        finalize_intake(st.session_state.intake_id)
-            
-            with col3:
-                st.markdown('<div class="secondary-btn">', unsafe_allow_html=True)
-                if st.button("Reset Session", key="reset_btn", use_container_width=True):
-                    reset_session()
-                st.markdown('</div>', unsafe_allow_html=True)
-            
-            # Session Statistics
-            st.markdown("#### Session Statistics")
-            
-            st.markdown('<div class="metrics-grid">', unsafe_allow_html=True)
-            
-            col1, col2, col3, col4 = st.columns(4)
-            
-            with col1:
-                st.markdown("""
-                <div class="metric-card">
-                    <div class="metric-value">1</div>
-                    <div class="metric-label">Active Session</div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col2:
-                upload_count = len([k for k in st.session_state.keys() if 'upload' in k.lower()])
-                st.markdown(f"""
-                <div class="metric-card">
-                    <div class="metric-value">{upload_count}</div>
-                    <div class="metric-label">Uploads</div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col3:
-                query_count = 1 if hasattr(st.session_state, 'last_query_response') else 0
-                st.markdown(f"""
-                <div class="metric-card">
-                    <div class="metric-value">{query_count}</div>
-                    <div class="metric-label">AI Queries</div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col4:
-                session_time = time.time() - st.session_state.get('session_start', time.time())
-                minutes = int(session_time // 60)
-                st.markdown(f"""
-                <div class="metric-card">
-                    <div class="metric-value">{minutes}</div>
-                    <div class="metric-label">Minutes Active</div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            st.markdown('</div>', unsafe_allow_html=True)
-        
-        else:
-            st.markdown("""
-            <div class="empty-state">
-                <h3>No Active Session</h3>
-                <p>Initialize an intake session in the 'Data Intake' tab to access management features.</p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        # System Information
-        with st.expander("System Information", expanded=False):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.markdown(f"""
-                **Organization:** {st.session_state.org_name}  
-                **Organization ID:** `{st.session_state.org_id}`  
-                **Session Started:** {time.strftime('%Y-%m-%d %H:%M:%S')}  
-                **Location:** Pune, Maharashtra, IN
-                """)
-            
-            with col2:
-                st.markdown(f"""
-                **API Endpoint:** `{API_BASE_URL}`  
-                **Streamlit Version:** `{st.__version__}`  
-                **Authentication:** Active  
-                **Platform:** Streamlit Cloud
-                """)
-
-    # Meeting Assistant Tab
-    with tab4:
-        st.markdown("""
-        <div class="card">
-            <div class="card-header">
                 <h2>Meeting Assistant</h2>
-                <p>Add Scooby AI to your meetings for automatic note-taking and intelligent insights</p>
+                <p>Add Scooby AI to your meetings</p>
             </div>
         </div>
         """, unsafe_allow_html=True)
         
         # Meeting link input section
         st.markdown("#### Meeting Details")
-        st.write("Enter your meeting link below to add Scooby AI assistant to automatically capture notes and generate insights.")
+        st.write("Enter your meeting link below to add Scooby to your meeting.")
         
         meeting_link = st.text_input(
             "Meeting Link",
